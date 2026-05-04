@@ -8,7 +8,6 @@ It helps manage job postings, applications, and tracking in a simple and efficie
 ## 🚀 Live Demo
 
 👉 Frontend: https://gshagun16.github.io/placement-portal/
-👉 Backend API: (Optional - Render/Railway link if deployed)  
 👉 GitHub Repo: https://github.com/gshagun16/placement-portal
 
 ---
