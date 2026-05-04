@@ -1,7 +1,11 @@
-const API = "http://localhost:5000";
+// 🔴 CHANGE THIS after deployment
+const API = "https://your-backend-url.onrender.com";
+
 let allJobs = [];
 
-// Add Job
+/* =======================
+   ADD JOB
+======================= */
 async function addJob() {
   const title = document.getElementById("title").value.trim();
   const company = document.getElementById("company").value.trim();
@@ -14,20 +18,24 @@ async function addJob() {
 
   await fetch(API + "/api/jobs/add", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title, company, location })
   });
 
   alert("Job Added!");
 
-  title.value = "";
-  company.value = "";
-  location.value = "";
+  document.getElementById("title").value = "";
+  document.getElementById("company").value = "";
+  document.getElementById("location").value = "";
+
+  getJobs(); // refresh UI
 }
 
-// Get Jobs
+/* =======================
+   GET JOBS
+======================= */
 async function getJobs() {
-  const res = await fetch(API + "/api/jobs/");
+  const res = await fetch(API + "/api/jobs");
   const data = await res.json();
 
   allJobs = data;
@@ -39,7 +47,7 @@ async function getJobs() {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      ${job.title} - ${job.company}
+      <b>${job.title}</b> - ${job.company} (${job.location})
       <button onclick="applyJob(${job.id})">Apply</button>
       <button onclick="deleteJob(${job.id})">Delete</button>
     `;
@@ -48,7 +56,9 @@ async function getJobs() {
   });
 }
 
-// Apply Job
+/* =======================
+   APPLY JOB
+======================= */
 async function applyJob(jobId) {
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
@@ -60,26 +70,35 @@ async function applyJob(jobId) {
 
   await fetch(API + "/api/jobs/apply", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ jobId, name, email })
   });
 
   alert("Applied Successfully!");
+
+  getJobs(); // refresh UI
 }
 
-// Delete Job
+/* =======================
+   DELETE JOB
+======================= */
 async function deleteJob(id) {
   await fetch(API + "/api/jobs/" + id, {
     method: "DELETE"
   });
 
   alert("Job Deleted!");
+
   getJobs();
 }
 
-// Show Applied Jobs
-function showApplied() {
-  const email = document.getElementById("email").value;
+/* =======================
+   SHOW APPLIED JOBS
+======================= */
+async function showApplied() {
+  await getJobs(); // ensure latest data
+
+  const email = document.getElementById("email").value.trim();
 
   const list = document.getElementById("appliedList");
   list.innerHTML = "";
@@ -91,7 +110,7 @@ function showApplied() {
 
     if (found) {
       const li = document.createElement("li");
-      li.innerText = job.title + " - " + job.company;
+      li.innerText = `${job.title} - ${job.company}`;
       list.appendChild(li);
     }
   });
