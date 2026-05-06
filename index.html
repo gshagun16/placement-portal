@@ -34,9 +34,13 @@
   <input id="company" placeholder="Company">
   <input id="location" placeholder="Location">
   <button onclick="addJob()">Add Job</button>
-
+  
   <h2>Search</h2>
   <input id="search" placeholder="Search..." oninput="getJobs()">
+
+<select id="filterCompany" onchange="getJobs()">
+  <option value="all">All Companies</option>
+</select>
 
   <h2>Jobs</h2>
   <div id="jobsList"></div>
