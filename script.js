@@ -1,8 +1,5 @@
-const API = "http://localhost:5000";
-let allJobs = [];
-
 // Add Job
-async function addJob() {
+function addJob() {
   const title = document.getElementById("title").value.trim();
   const company = document.getElementById("company").value.trim();
   const location = document.getElementById("location").value.trim();
@@ -12,30 +9,29 @@ async function addJob() {
     return;
   }
 
-  await fetch(API + "/api/jobs/add", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ title, company, location })
+  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+  jobs.push({
+    id: Date.now(),
+    title,
+    company,
+    location,
+    applicants: []
   });
 
-  alert("Job Added!");
+  localStorage.setItem("jobs", JSON.stringify(jobs));
 
-  title.value = "";
-  company.value = "";
-  location.value = "";
+  alert("Job Added!");
 }
 
-// Get Jobs
-async function getJobs() {
-  const res = await fetch(API + "/api/jobs/");
-  const data = await res.json();
-
-  allJobs = data;
+// Show Jobs
+function getJobs() {
+  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
 
   const list = document.getElementById("jobsList");
   list.innerHTML = "";
 
-  data.forEach(job => {
+  jobs.forEach(job => {
     const li = document.createElement("li");
 
     li.innerHTML = `
@@ -49,7 +45,7 @@ async function getJobs() {
 }
 
 // Apply Job
-async function applyJob(jobId) {
+function applyJob(id) {
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
 
@@ -58,35 +54,41 @@ async function applyJob(jobId) {
     return;
   }
 
-  await fetch(API + "/api/jobs/apply", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ jobId, name, email })
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+  jobs = jobs.map(job => {
+    if (job.id == id) {
+      job.applicants.push({ name, email });
+    }
+    return job;
   });
 
-  alert("Applied Successfully!");
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+
+  alert("Applied!");
 }
 
 // Delete Job
-async function deleteJob(id) {
-  await fetch(API + "/api/jobs/" + id, {
-    method: "DELETE"
-  });
+function deleteJob(id) {
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
 
-  alert("Job Deleted!");
+  jobs = jobs.filter(job => job.id != id);
+
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+
   getJobs();
 }
 
-// Show Applied Jobs
+// Show Applied
 function showApplied() {
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
+
+  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
 
   const list = document.getElementById("appliedList");
   list.innerHTML = "";
 
-  allJobs.forEach(job => {
-    if (!job.applicants) return;
-
+  jobs.forEach(job => {
     const found = job.applicants.find(a => a.email === email);
 
     if (found) {
