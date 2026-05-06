@@ -6,15 +6,28 @@
 </head>
 <body>
 
-<h1>Placement Portal</h1>
+<div class="header">
+  <h1>Placement Portal</h1>
+  <button class="toggle-btn" onclick="toggleTheme()">🌙 Dark Mode</button>
+</div>
 
-<div class="container">
+<!-- AUTH -->
+<div class="container" id="authBox">
+  <h2>Login / Register</h2>
+
+  <input id="authName" placeholder="Name">
+  <input id="authEmail" placeholder="Email">
+  <input id="authPassword" type="password" placeholder="Password">
+
+  <button onclick="register()">Register</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div class="container" id="appBox" style="display:none;">
 
   <p id="msg"></p>
-
-  <h2>User Info</h2>
-  <input id="name" placeholder="Name">
-  <input id="email" placeholder="Email">
+  <button onclick="logout()">Logout</button>
 
   <h2>Add Job</h2>
   <input id="title" placeholder="Job Title">
@@ -22,16 +35,13 @@
   <input id="location" placeholder="Location">
   <button onclick="addJob()">Add Job</button>
 
-  <h2>Search & Filter</h2>
-  <input id="search" placeholder="Search job title..." oninput="getJobs()">
-  <input id="filterLocation" placeholder="Filter by location" oninput="getJobs()">
+  <h2>Search</h2>
+  <input id="search" placeholder="Search..." oninput="getJobs()">
 
-  <h2>All Jobs</h2>
-  <button onclick="getJobs()">Show Jobs</button>
-  <ul id="jobsList"></ul>
+  <h2>Jobs</h2>
+  <div id="jobsList"></div>
 
   <h2>My Applications</h2>
-  <button onclick="showApplied()">Show Applied Jobs</button>
   <ul id="appliedList"></ul>
 
 </div>
