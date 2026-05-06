@@ -27,14 +27,14 @@ function register() {
   let users = JSON.parse(localStorage.getItem("users")) || [];
 
   if (users.find(u => u.email === email)) {
-    alert("User already exists");
+    alert("User exists");
     return;
   }
 
   users.push({ name, email, password });
   localStorage.setItem("users", JSON.stringify(users));
 
-  showMsg("Registered successfully!");
+  showMsg("Registered!");
 }
 
 function login() {
@@ -45,7 +45,7 @@ function login() {
   const user = users.find(u => u.email === email && u.password === password);
 
   if (!user) {
-    alert("Invalid credentials");
+    alert("Invalid");
     return;
   }
 
@@ -64,19 +64,18 @@ function checkLogin() {
   if (user) {
     authBox.style.display = "none";
     appBox.style.display = "block";
+    getJobs();
+    showApplied();
+    loadCompanies();
   }
 }
 checkLogin();
 
 // ADD JOB
 function addJob() {
-  const titleInput = document.getElementById("title");
-  const companyInput = document.getElementById("company");
-  const locationInput = document.getElementById("location");
-
-  const title = titleInput.value;
-  const company = companyInput.value;
-  const location = locationInput.value;
+  const title = document.getElementById("title").value;
+  const company = document.getElementById("company").value;
+  const location = document.getElementById("location").value;
 
   if (!title || !company || !location) {
     alert("Fill all fields");
@@ -96,28 +95,35 @@ function addJob() {
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
   showMsg("Job added!");
-
-  // CLEAR INPUTS
-  titleInput.value = "";
-  companyInput.value = "";
-  locationInput.value = "";
-
+  clearInputs();
   getJobs();
+  loadCompanies();
 }
 
-// SHOW JOBS
+function clearInputs() {
+  title.value = "";
+  company.value = "";
+  location.value = "";
+}
+
+// GET JOBS
 function getJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
   const user = JSON.parse(localStorage.getItem("loggedUser"));
   const search = document.getElementById("search").value.toLowerCase();
+  const filterCompany = document.getElementById("filterCompany").value;
 
   const list = document.getElementById("jobsList");
   list.innerHTML = "";
 
-  const filtered = jobs.filter(j =>
+  let filtered = jobs.filter(j =>
     j.title.toLowerCase().includes(search) ||
     j.company.toLowerCase().includes(search)
   );
+
+  if (filterCompany !== "all") {
+    filtered = filtered.filter(j => j.company === filterCompany);
+  }
 
   if (filtered.length === 0) {
     list.innerHTML = "<p>No jobs found</p>";
@@ -135,11 +141,16 @@ function getJobs() {
         <p><b>${job.company}</b></p>
         <p>${job.location}</p>
 
+        <p>👥 Applicants: ${job.applicants.length}</p>
+
         ${
           applied
             ? `<button onclick="withdrawJob(${job.id})">Withdraw</button>`
             : `<button onclick="applyJob(${job.id})">Apply</button>`
         }
+
+        <button onclick="editJob(${job.id})">Edit</button>
+        <button onclick="deleteJob(${job.id})">Delete</button>
       </div>
     `;
 
@@ -163,12 +174,12 @@ function applyJob(id) {
 
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
-  showMsg("Applied successfully!");
+  showMsg("Applied!");
   getJobs();
   showApplied();
 }
 
-// WITHDRAW (DELETE APPLICATION)
+// WITHDRAW
 function withdrawJob(id) {
   const user = JSON.parse(localStorage.getItem("loggedUser"));
   let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
@@ -182,12 +193,47 @@ function withdrawJob(id) {
 
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
-  showMsg("Application withdrawn!");
+  showMsg("Withdrawn!");
   getJobs();
   showApplied();
 }
 
-// SHOW APPLIED JOBS
+// EDIT JOB
+function editJob(id) {
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+  const job = jobs.find(j => j.id == id);
+
+  const newTitle = prompt("Edit Title", job.title);
+  const newCompany = prompt("Edit Company", job.company);
+  const newLocation = prompt("Edit Location", job.location);
+
+  if (!newTitle || !newCompany || !newLocation) return;
+
+  job.title = newTitle;
+  job.company = newCompany;
+  job.location = newLocation;
+
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+
+  showMsg("Updated!");
+  getJobs();
+}
+
+// DELETE JOB
+function deleteJob(id) {
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+  jobs = jobs.filter(j => j.id != id);
+
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+
+  showMsg("Deleted!");
+  getJobs();
+  showApplied();
+}
+
+// SHOW APPLIED
 function showApplied() {
   const user = JSON.parse(localStorage.getItem("loggedUser"));
   const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
@@ -201,5 +247,22 @@ function showApplied() {
       li.innerText = job.title + " - " + job.company;
       list.appendChild(li);
     }
+  });
+}
+
+// LOAD COMPANY FILTER
+function loadCompanies() {
+  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+  const select = document.getElementById("filterCompany");
+
+  const companies = [...new Set(jobs.map(j => j.company))];
+
+  select.innerHTML = `<option value="all">All Companies</option>`;
+
+  companies.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.text = c;
+    select.appendChild(opt);
   });
 }
