@@ -1,61 +1,87 @@
 body {
   font-family: Arial;
-  background: #eef2f7;
-  padding: 20px;
+  margin: 0;
+  transition: 0.4s;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #333;
 }
 
-h1 {
+.dark {
+  background: #1a1a2e;
+  color: white;
+}
+
+.header {
   text-align: center;
-  margin-bottom: 20px;
+  padding: 20px;
+  color: white;
 }
 
 .container {
-  max-width: 500px;
-  margin: auto;
+  max-width: 700px;
+  margin: 20px auto;
   background: white;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  transition: 0.4s;
+}
+
+.dark .container {
+  background: #16213e;
 }
 
 input {
-  display: block;
   width: 100%;
-  margin: 8px 0;
-  padding: 8px;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
 button {
-  padding: 8px 12px;
-  background: #007bff;
-  color: white;
+  padding: 10px;
+  margin: 5px;
   border: none;
+  border-radius: 6px;
+  background: #667eea;
+  color: white;
   cursor: pointer;
-  margin-top: 5px;
-  border-radius: 5px;
+  transition: 0.3s;
 }
 
 button:hover {
-  background: #0056b3;
+  transform: scale(1.05);
+  background: #5a67d8;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+.job-card {
+  background: #f1f1f1;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  animation: fadeIn 0.5s ease;
 }
 
-li {
-  background: #eee;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
+.dark .job-card {
+  background: #0f3460;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toggle-btn {
+  margin-top: 10px;
+  background: black;
 }
 
 #msg {
   color: green;
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 10px;
 }
