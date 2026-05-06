@@ -1,3 +1,9 @@
+function showMsg(text) {
+  const msg = document.getElementById("msg");
+  msg.innerText = text;
+  setTimeout(() => msg.innerText = "", 2000);
+}
+
 // Add Job
 function addJob() {
   const title = document.getElementById("title").value.trim();
@@ -5,7 +11,7 @@ function addJob() {
   const location = document.getElementById("location").value.trim();
 
   if (!title || !company || !location) {
-    alert("All fields required!");
+    showMsg("All fields required!");
     return;
   }
 
@@ -21,27 +27,39 @@ function addJob() {
 
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
-  alert("Job Added!");
+  showMsg("Job Added!");
+
+  document.getElementById("title").value = "";
+  document.getElementById("company").value = "";
+  document.getElementById("location").value = "";
 }
 
-// Show Jobs
+// Show Jobs + Search + Filter
 function getJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+  const search = document.getElementById("search").value.toLowerCase();
+  const locationFilter = document.getElementById("filterLocation").value.toLowerCase();
 
   const list = document.getElementById("jobsList");
   list.innerHTML = "";
 
-  jobs.forEach(job => {
-    const li = document.createElement("li");
+  jobs
+    .filter(job =>
+      job.title.toLowerCase().includes(search) &&
+      job.location.toLowerCase().includes(locationFilter)
+    )
+    .forEach(job => {
+      const li = document.createElement("li");
 
-    li.innerHTML = `
-      ${job.title} - ${job.company}
-      <button onclick="applyJob(${job.id})">Apply</button>
-      <button onclick="deleteJob(${job.id})">Delete</button>
-    `;
+      li.innerHTML = `
+        <b>${job.title}</b> - ${job.company} (${job.location})
+        <br>
+        <button onclick="applyJob(${job.id})">Apply</button>
+        <button onclick="deleteJob(${job.id})">Delete</button>
+      `;
 
-    list.appendChild(li);
-  });
+      list.appendChild(li);
+    });
 }
 
 // Apply Job
@@ -50,7 +68,7 @@ function applyJob(id) {
   const email = document.getElementById("email").value.trim();
 
   if (!name || !email) {
-    alert("Enter name and email!");
+    showMsg("Enter name and email!");
     return;
   }
 
@@ -58,6 +76,14 @@ function applyJob(id) {
 
   jobs = jobs.map(job => {
     if (job.id == id) {
+
+      const alreadyApplied = job.applicants.find(a => a.email === email);
+
+      if (alreadyApplied) {
+        showMsg("Already applied!");
+        return job;
+      }
+
       job.applicants.push({ name, email });
     }
     return job;
@@ -65,7 +91,7 @@ function applyJob(id) {
 
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
-  alert("Applied!");
+  showMsg("Applied Successfully!");
 }
 
 // Delete Job
@@ -76,12 +102,18 @@ function deleteJob(id) {
 
   localStorage.setItem("jobs", JSON.stringify(jobs));
 
+  showMsg("Job Deleted!");
   getJobs();
 }
 
-// Show Applied
+// Show Applied Jobs
 function showApplied() {
   const email = document.getElementById("email").value.trim();
+
+  if (!email) {
+    showMsg("Enter email first!");
+    return;
+  }
 
   const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
 
