@@ -94,6 +94,8 @@ Backend and database integration will be added in future versions.
 
 # 👨‍💻 Author
 
+##Shagun Gupta ##
+
 * GitHub: https://github.com/gshagun16
 
 ---
